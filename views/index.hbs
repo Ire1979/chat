@@ -1,0 +1,78 @@
+<div class="titulo">
+    <h1>CHAT</h1>
+    <h2 id="h2">Clientes conectados: 0</h2>
+</div>
+<div class="conversacion">
+    <ul id="mensajes">
+        <li></li>
+    </ul>
+</div>
+<div class="formulario">
+    <div>
+        <label>Nombre</label>
+        <input id="inputNombre" type="text">
+    </div>
+    <div>
+        <label>Mensaje</label>
+        <input id="inputMensaje" type="text">
+    </div>
+    <div>
+        <button id="btnEnviar">Enviar</button>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    // Código JS de la parte cliente
+
+    // Conectamos con el servidor de WS (web socket)
+    const socket = io();
+
+    // Cuando haga click en el botón mostrar un console.log con un objeto que tenga esta pinta:
+
+    /*
+    {
+        nombre: VALOR DEL INPUT NOMBRE
+        mensaje: VALOR DEL INPUT MENSAJE
+    }
+
+        document.getElementById
+        BOTON.addEventListener  
+    */
+    const inputNombre = document.getElementById('inputNombre');
+    const inputMensaje = document.getElementById('inputMensaje');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const mensajes = document.getElementById('mensajes');
+    const h2 = document.getElementById('h2');
+    const main = document.getElementById("main");
+
+    btnEnviar.addEventListener('click', () => {
+
+        const datos = {
+            nombre: inputNombre.value,
+            mensaje: inputMensaje.value
+        }
+        socket.emit('mensaje_chat', datos);
+    });
+
+    socket.on('mensaje_chat', (datos) => {
+        console.log(datos);
+        // Generar un li con los datos de nombre y mensaje
+        // Agregar ese LI al UL de mensajes
+        // createElement y append
+        const li = document.createElement('li');
+        li.innerText = `${datos.nombre}: ${datos.mensaje}`;
+
+        mensajes.append(li);
+
+        main.scrollTop = main.scrollHeight;
+
+        socket.on('clientes_chat', (datos) => {
+            // datos es el número de clientes conectados
+            // Modificar el h2 para que aparezcan los clientes conectados
+            h2.innerText = `Clientes conectados: ${datos}`;
+        });
+
+    });
+
+</script>
